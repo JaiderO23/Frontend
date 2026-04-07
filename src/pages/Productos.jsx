@@ -8,6 +8,7 @@ import Badge from '../components/ui/Badge'
 import ProductoForm from '../components/productos/ProductoForm'
 import { useProductos } from '../hooks/useProductos'
 import { useCategorias } from '../hooks/useCategorias'
+import ConfirmModal from '../components/ui/ConfirmModal'
 
 export default function Productos() {
   const { productos, loading, saving, createProducto, updateProducto, deleteProducto } = useProductos()
@@ -16,6 +17,8 @@ export default function Productos() {
   const [showModal, setShowModal] = useState(false)
   const [selectedProducto, setSelectedProducto] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+const [productoToDelete, setProductoToDelete] = useState(null)
   
   const filteredProductos = productos.filter(p =>
     p.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -32,11 +35,17 @@ export default function Productos() {
     setShowModal(true)
   }
   
-  const handleDelete = async (producto) => {
-    if (window.confirm(`¿Eliminar producto "${producto.nombre}"?`)) {
-      await deleteProducto(producto.id)
-    }
+  const handleDelete = (producto) => {
+  setProductoToDelete(producto)
+  setShowDeleteConfirm(true)
+}
+
+const confirmDelete = async () => {
+  if (productoToDelete) {
+    await deleteProducto(productoToDelete.id)
+    setProductoToDelete(null)
   }
+}
   
   const handleSubmit = async (data) => {
     let success
@@ -202,6 +211,17 @@ export default function Productos() {
           loading={saving}
         />
       </Modal>
+
+      <ConfirmModal
+  isOpen={showDeleteConfirm}
+  onClose={() => setShowDeleteConfirm(false)}
+  onConfirm={confirmDelete}
+  title="Eliminar Producto"
+  message={`¿Estás seguro de eliminar el producto "${productoToDelete?.nombre}"? Esta acción no se puede deshacer.`}
+  confirmText="Eliminar"
+  cancelText="Cancelar"
+  variant="danger"
+/>
     </div>
   )
 }
