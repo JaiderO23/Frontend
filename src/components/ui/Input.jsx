@@ -1,5 +1,6 @@
 export default function Input({
   label,
+  name,
   type = 'text',
   placeholder,
   value,
@@ -20,6 +21,7 @@ export default function Input({
       
       <input
         type={type}
+        name={name}
         value={value}
         onChange={onChange}
         placeholder={placeholder}

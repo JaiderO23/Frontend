@@ -1,9 +1,10 @@
 export default function Select({
   label,
+  name,
   value,
   onChange,
   options = [],
-  placeholder = 'Seleccionar...',
+  placeholder,
   error,
   required = false,
   disabled = false,
@@ -19,6 +20,7 @@ export default function Select({
       )}
       
       <select
+        name={name}
         value={value}
         onChange={onChange}
         disabled={disabled}
@@ -31,7 +33,9 @@ export default function Select({
           ${className}
         `}
       >
-        <option value="">{placeholder}</option>
+        {placeholder && (
+          <option value="">{placeholder}</option>
+        )}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
