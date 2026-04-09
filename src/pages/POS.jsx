@@ -89,13 +89,13 @@ export default function POS() {
         </div>
         
         {/* Columna Derecha - Carrito */}
-        <div className="flex flex-col space-y-4">
-          <Cart
-            items={items}
-            onUpdateQuantity={updateQuantity}
-            onRemove={removeItem}
-            total={total}
-          />
+        <div className="flex flex-col h-full">
+        <Cart
+          items={items}
+          onUpdateQuantity={updateQuantity}
+          onRemove={removeItem}
+          total={total}
+        />
         </div>
       </div>
       
