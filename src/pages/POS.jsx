@@ -8,6 +8,7 @@ import ClienteSelector from '../components/pos/ClienteSelector'
 import VentaConfig from '../components/pos/VentaConfig'
 import Modal from '../components/ui/Modal'
 import { usePOS } from '../hooks/usePOS'
+import Comprobante from '../components/pos/Comprobante'
 
 export default function POS() {
   const {
@@ -28,16 +29,18 @@ export default function POS() {
     setMetodoPago,
     procesarVenta
   } = usePOS()
-  
+
+  const [ventaRealizada, setVentaRealizada] = useState(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  
+
   const handleProcesarVenta = async () => {
     const venta = await procesarVenta()
     if (venta) {
       setShowConfirmModal(false)
+      setVentaRealizada(venta)
     }
   }
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -48,7 +51,7 @@ export default function POS() {
       </div>
     )
   }
-  
+
   return (
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
@@ -56,7 +59,7 @@ export default function POS() {
           <h1 className="text-3xl font-bold text-gray-800">Punto de Venta</h1>
           <p className="text-gray-600 mt-1">Registra una nueva venta</p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="text-sm text-gray-600">Total</p>
@@ -64,7 +67,7 @@ export default function POS() {
               ${total.toLocaleString()}
             </p>
           </div>
-          
+
           <Button
             size="lg"
             onClick={() => setShowConfirmModal(true)}
@@ -76,9 +79,8 @@ export default function POS() {
           </Button>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-3 gap-6 flex-1 overflow-hidden">
-        {/* Columna Izquierda - Búsqueda de Productos */}
         <div className="col-span-2 flex flex-col">
           <Card title="Productos" className="flex-1 flex flex-col">
             <ProductSearch
@@ -87,18 +89,17 @@ export default function POS() {
             />
           </Card>
         </div>
-        
-        {/* Columna Derecha - Carrito */}
+
         <div className="flex flex-col h-full">
-        <Cart
-          items={items}
-          onUpdateQuantity={updateQuantity}
-          onRemove={removeItem}
-          total={total}
-        />
+          <Cart
+            items={items}
+            onUpdateQuantity={updateQuantity}
+            onRemove={removeItem}
+            total={total}
+          />
         </div>
       </div>
-      
+
       {/* Modal de Confirmación */}
       <Modal
         isOpen={showConfirmModal}
@@ -107,47 +108,40 @@ export default function POS() {
         size="lg"
       >
         <div className="space-y-6">
-          {/* Configuración de Venta */}
           <VentaConfig
             tipoVenta={tipoVenta}
             metodoPago={metodoPago}
             onChangeTipo={setTipoVenta}
             onChangeMetodo={setMetodoPago}
           />
-          
-          {/* Selector de Cliente */}
+
           <ClienteSelector
             clientes={clientes}
             selectedCliente={cliente}
             onSelectCliente={setCliente}
             tipoVenta={tipoVenta}
           />
-          
-          {/* Resumen */}
+
           <Card title="Resumen de la Venta">
             <div className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Productos:</span>
                 <span className="font-medium">{items.length} items</span>
               </div>
-              
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Tipo de venta:</span>
                 <span className="font-medium">{tipoVenta}</span>
               </div>
-              
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Método de pago:</span>
                 <span className="font-medium">{metodoPago}</span>
               </div>
-              
               {cliente && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Cliente:</span>
                   <span className="font-medium">{cliente.nombre} {cliente.apellido}</span>
                 </div>
               )}
-              
               <div className="border-t pt-3 flex justify-between text-lg">
                 <span className="font-bold">Total:</span>
                 <span className="font-bold text-blue-600">
@@ -156,8 +150,7 @@ export default function POS() {
               </div>
             </div>
           </Card>
-          
-          {/* Botones */}
+
           <div className="flex gap-3">
             <Button
               variant="secondary"
@@ -167,7 +160,7 @@ export default function POS() {
             >
               Cancelar
             </Button>
-            
+
             <Button
               onClick={handleProcesarVenta}
               className="flex-1 flex items-center justify-center gap-2"
@@ -188,6 +181,14 @@ export default function POS() {
           </div>
         </div>
       </Modal>
+
+      {/* Comprobante */}
+      <Comprobante
+        isOpen={!!ventaRealizada}
+        onClose={() => setVentaRealizada(null)}
+        venta={ventaRealizada}
+      />
+
     </div>
   )
 }

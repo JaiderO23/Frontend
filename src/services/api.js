@@ -1,9 +1,7 @@
 import axios from 'axios'
 
-// URL base del backend
 const API_URL = 'http://localhost:8081/api'
 
-// Crear instancia de axios
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -11,13 +9,28 @@ const api = axios.create({
   },
 })
 
-// Interceptor para manejar errores globalmente
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message)
-    return Promise.reject(error)
-  }
+// Interceptor de REQUEST - agregar token JWT automáticamente
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
 )
 
+// Interceptor de RESPONSE - manejar errores globalmente
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    console.log('Token enviado:', token ? 'SÍ' : 'NO', config.url)
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 export default api

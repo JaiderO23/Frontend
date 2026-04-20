@@ -14,6 +14,7 @@ export function useDashboard() {
   const loadDashboard = async () => {
     try {
       setLoading(true)
+      setError(null)
       const response = await reportesService.dashboard()
       setData(response.data)
     } catch (err) {

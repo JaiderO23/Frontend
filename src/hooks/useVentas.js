@@ -23,9 +23,5 @@ export function useVentas() {
     }
   }
   
-  return {
-    ventas,
-    loading,
-    reload: loadVentas
-  }
+  return { ventas, loading, reload: loadVentas }
 }

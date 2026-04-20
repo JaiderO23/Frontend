@@ -23,4 +23,7 @@ export const reportesService = {
   
   ventasPorUsuario: (inicio, fin) => 
     api.get(`/reportes/ventas/por-usuario?inicio=${inicio}&fin=${fin}`),
+
+  ventasPorMetodoPagoEnRango: (inicio, fin) =>
+    api.get(`/reportes/ventas/por-metodo-pago?inicio=${inicio}&fin=${fin}`),
 }

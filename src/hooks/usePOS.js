@@ -35,9 +35,9 @@ export function usePOS() {
     try {
       setLoading(true)
       const [productosRes, clientesRes] = await Promise.all([
-        productosService.getAll(),
-        clientesService.getAll()
-      ])
+  productosService.getActivos(),
+  clientesService.getActivos()
+])
       setProductos(productosRes.data)
       setClientes(clientesRes.data)
     } catch (error) {
@@ -48,18 +48,15 @@ export function usePOS() {
     }
   }
   
-  // ✅ Agregar con validación de stock
   const addItem = (producto) => {
     const existingItem = items.find(item => item.producto.id === producto.id)
     
     if (existingItem) {
-      // Validar que no exceda el stock
       if (existingItem.cantidad >= producto.stockActual) {
         toast.error(`Stock insuficiente. Disponible: ${producto.stockActual}`)
         return
       }
     } else {
-      // Validar que haya stock
       if (producto.stockActual <= 0) {
         toast.error('Producto sin stock')
         return
@@ -69,40 +66,33 @@ export function usePOS() {
     addItemStore(producto)
   }
   
-  
   const updateQuantity = (productoId, newQuantity) => {
     const item = items.find(i => i.producto.id === productoId)
-    
     if (!item) return
     
-    // Validar stock disponible
     if (newQuantity > item.producto.stockActual) {
       toast.error(`Stock insuficiente. Disponible: ${item.producto.stockActual}`)
       return
     }
     
-    // Validar cantidad mínima
-    if (newQuantity < 1) {
-      return
-    }
+    if (newQuantity < 1) return
     
     updateQuantityStore(productoId, newQuantity)
   }
   
   const procesarVenta = async () => {
-    // Validaciones
     if (items.length === 0) {
-      toast.error('El carrito está vacío')
+      toast.error('El carrito esta vacio')
       return
     }
     
     if (tipoVenta === 'CREDITO' && !cliente) {
-      toast.error('Selecciona un cliente para venta a crédito')
+      toast.error('Selecciona un cliente para venta a credito')
       return
     }
     
     if (tipoVenta === 'CREDITO' && cliente.creditoDisponible < getTotal()) {
-      toast.error('El cliente no tiene suficiente crédito disponible')
+      toast.error('El cliente no tiene suficiente credito disponible')
       return
     }
     
@@ -124,8 +114,6 @@ export function usePOS() {
       const response = await ventasService.create(ventaData)
       
       toast.success(`Venta ${response.data.numeroVenta} creada exitosamente`)
-      
-      // Limpiar carrito y recargar productos
       clearCart()
       await loadData()
       
