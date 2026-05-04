@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/useAuthStore'
 import { puedeAcceder } from '../../utils/roles'
 
+
 export default function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -28,9 +29,14 @@ export default function Sidebar() {
   return (
     <div className="w-64 bg-gray-900 text-white min-h-screen flex flex-col">
       <div className="p-6 border-b border-gray-800">
-        <h1 className="text-2xl font-bold">🚀 Sistema POS</h1>
-        <p className="text-sm text-gray-400 mt-1">Punto de Venta</p>
-      </div>
+  <div className="flex items-center gap-3">
+    <img src="/posbarrio_mini.svg" alt="PosBarrio" className="w-12 h-12 flex-shrink-0" />
+    <div>
+      <h1 className="text-2xl font-bold">PosBarrio</h1>
+      <p className="text-sm text-gray-400 mt-1">Punto de Venta</p>
+    </div>
+  </div>
+</div>
 
       <nav className="p-4 space-y-1 flex-1">
         {menuItems
