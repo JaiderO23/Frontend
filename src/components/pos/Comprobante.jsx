@@ -16,15 +16,17 @@ export default function Comprobante({ isOpen, onClose, venta }) {
 
   if (!venta) return null
 
-  const tieneCliente = !!venta.cliente
-  const telefonoCliente = venta.cliente?.telefono
+  // Ahora el backend devuelve clienteId/clienteNombre directamente, no un objeto cliente anidado
+  const tieneCliente = !!venta.clienteId
+  // El teléfono ya no viene en el response. Si lo necesitas, hay que agregarlo al DTO del backend.
+  const telefonoCliente = venta.clienteTelefono || null
 
   const handleImprimir = () => {
     window.print()
   }
 
   const handleWhatsApp = () => {
-    const telefono = tieneCliente ? telefonoCliente : telefonoManual
+    const telefono = tieneCliente && telefonoCliente ? telefonoCliente : telefonoManual
 
     if (!telefono || telefono.trim() === '') {
       alert('Ingresa un número de WhatsApp para enviar el comprobante')
@@ -44,7 +46,7 @@ export default function Comprobante({ isOpen, onClose, venta }) {
     msg += `Fecha: ${fecha}\n\n`
     msg += `*PRODUCTOS:*\n`
     venta.detalles?.forEach(d => {
-      msg += `• ${d.producto.nombre} x${d.cantidad} = ${formatCurrency(d.subtotal)}\n`
+      msg += `• ${d.productoNombre} x${d.cantidad} = ${formatCurrency(d.subtotal)}\n`
     })
     msg += `\n*Subtotal:* ${formatCurrency(venta.subtotal)}`
     if (venta.descuento > 0) {
@@ -88,11 +90,11 @@ export default function Comprobante({ isOpen, onClose, venta }) {
               </p>
             </div>
 
-            {venta.cliente && (
+            {tieneCliente && (
               <div className="mb-3 border-t pt-2">
                 <p className="text-gray-600 text-xs">
                   Cliente: <span className="font-medium text-gray-800">
-                    {venta.cliente.nombre} {venta.cliente.apellido}
+                    {venta.clienteNombre}
                   </span>
                 </p>
                 {telefonoCliente && (
@@ -104,7 +106,7 @@ export default function Comprobante({ isOpen, onClose, venta }) {
             <div className="border-t border-b py-2 mb-2">
               {venta.detalles?.map((detalle, i) => (
                 <div key={i} className="flex justify-between text-xs mb-1">
-                  <span className="flex-1">{detalle.producto.nombre}</span>
+                  <span className="flex-1">{detalle.productoNombre}</span>
                   <span className="mx-2">x{detalle.cantidad}</span>
                   <span>{formatCurrency(detalle.subtotal)}</span>
                 </div>

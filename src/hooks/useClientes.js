@@ -17,7 +17,7 @@ export function useClientes() {
       const response = await clientesService.getAll()
       setClientes(response.data)
     } catch (error) {
-      toast.error('Error al cargar clientes')
+      toast.error(error.response?.data?.error || 'Error al cargar clientes')
       console.error(error)
     } finally {
       setLoading(false)
@@ -32,7 +32,7 @@ export function useClientes() {
       await loadClientes()
       return true
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Error al crear cliente')
+      toast.error(error.response?.data?.error || 'Error al crear cliente')
       console.error(error)
       return false
     } finally {
@@ -48,7 +48,7 @@ export function useClientes() {
       await loadClientes()
       return true
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Error al actualizar cliente')
+      toast.error(error.response?.data?.error || 'Error al actualizar cliente')
       console.error(error)
       return false
     } finally {
@@ -63,7 +63,7 @@ export function useClientes() {
       await loadClientes()
       return true
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Error al eliminar cliente')
+      toast.error(error.response?.data?.error || 'Error al eliminar cliente')
       console.error(error)
       return false
     }
