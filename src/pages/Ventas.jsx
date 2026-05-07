@@ -37,33 +37,28 @@ export default function Ventas() {
       render: (value) => `#${value}`
     },
     {
-      key: 'creadoEn',
-      label: 'Fecha',
-      render: (value) => {
-        if (!value) return 'Sin fecha'
+  key: 'fecha',
+  label: 'Fecha',
+  render: (value, row) => {
+    
+    if (!value) return 'Sin fecha'
 
-        const fecha = new Date(value)
+    const fecha = new Date(value)
+    if (isNaN(fecha.getTime())) return 'Fecha inválida'
 
-        if (isNaN(fecha.getTime())) {
-          return 'Fecha inválida'
-        }
-
-        return fecha.toLocaleDateString('es-CO', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit'
-        })
-      }
-    },
+    return fecha.toLocaleDateString('es-CO', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+},
     {
-      key: 'cliente',
+      key: 'clienteNombre',
       label: 'Cliente',
-      render: (value) =>
-        value
-          ? `${value.nombre} ${value.apellido}`
-          : 'Cliente General'
+      render: (value) => value || 'Cliente General'
     },
     {
       key: 'tipoVenta',
