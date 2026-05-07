@@ -1,32 +1,28 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
-export const useAuthStore = create((set) => ({
-  user: null,
-  token: null,
-  isAuthenticated: false,
+export const useAuthStore = create(
+  persist(
+    (set) => ({
+      user: null,
+      token: null,
+      isAuthenticated: false,
 
-  login: (userData, token) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('usuario', JSON.stringify(userData))
-    set({ user: userData, token, isAuthenticated: true })
-  },
+      login: (userData, token) => {
+        // mantenemos también las claves planas para que api.js siga funcionando
+        localStorage.setItem('token', token)
+        localStorage.setItem('usuario', JSON.stringify(userData))
+        set({ user: userData, token, isAuthenticated: true })
+      },
 
-  logout: () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('usuario')
-    set({ user: null, token: null, isAuthenticated: false })
-  },
-
-  // Restaurar sesión al recargar la página
-  restoreSession: () => {
-    const token = localStorage.getItem('token')
-    const usuario = localStorage.getItem('usuario')
-    if (token && usuario) {
-      set({
-        user: JSON.parse(usuario),
-        token,
-        isAuthenticated: true
-      })
+      logout: () => {
+        localStorage.removeItem('token')
+        localStorage.removeItem('usuario')
+        set({ user: null, token: null, isAuthenticated: false })
+      },
+    }),
+    {
+      name: 'posbarrio-auth', // clave bajo la cual se guarda en localStorage
     }
-  }
-}))
+  )
+)

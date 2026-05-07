@@ -73,33 +73,44 @@ export default function Usuarios() {
   }
 
   const handleGuardar = async () => {
-    if (!form.nombreUsuario || !form.nombreCompleto || !form.rol) {
-      toast.error('Completa todos los campos obligatorios')
-      return
-    }
-    if (!editando && !form.contraseña) {
-      toast.error('La contraseña es obligatoria para nuevos usuarios')
-      return
-    }
-
-    try {
-      setGuardando(true)
-      if (editando) {
-        await api.put(`/usuarios/${editando.id}`, form)
-        toast.success('Usuario actualizado')
-      } else {
-        await api.post('/usuarios', form)
-        toast.success('Usuario creado')
-      }
-      cerrarModal()
-      cargarUsuarios()
-    } catch (error) {
-      toast.error(error.response?.data?.error || 'Error al guardar usuario')
-    } finally {
-      setGuardando(false)
-    }
+  if (!form.nombreUsuario || !form.nombreCompleto || !form.rol) {
+    toast.error('Completa todos los campos obligatorios')
+    return
+  }
+  if (!editando && !form.contraseña) {
+    toast.error('La contraseña es obligatoria para nuevos usuarios')
+    return
   }
 
+  try {
+    setGuardando(true)
+    
+    if (editando) {
+      // Si la contraseña está vacía, NO la enviamos al backend
+      const datosActualizar = { ...form }
+      if (!datosActualizar.contraseña || datosActualizar.contraseña.trim() === '') {
+        delete datosActualizar.contraseña
+      }
+      
+      console.log('Enviando PUT a /usuarios/' + editando.id, datosActualizar)
+      const response = await api.put(`/usuarios/${editando.id}`, datosActualizar)
+      console.log('Respuesta:', response.data)
+      toast.success('Usuario actualizado')
+    } else {
+      await api.post('/usuarios', form)
+      toast.success('Usuario creado')
+    }
+    
+    cerrarModal()
+    cargarUsuarios()
+  } catch (error) {
+    console.error('Error completo:', error)
+    console.error('Response data:', error.response?.data)
+    toast.error(error.response?.data?.error || 'Error al guardar usuario')
+  } finally {
+    setGuardando(false)
+  }
+}
   const toggleActivo = async (usuario) => {
   try {
     if (usuario.activo) {

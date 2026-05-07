@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
 import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard'
 import POS from './pages/POS'
@@ -27,12 +26,6 @@ function PrivateRoute({ children, permiso }) {
 }
 
 function App() {
-  const { restoreSession } = useAuthStore()
-
-  useEffect(() => {
-    restoreSession()
-  }, [])
-
   return (
     <BrowserRouter>
       <Routes>
