@@ -8,24 +8,28 @@ import { useVentas } from '../hooks/useVentas'
 
 export default function Ventas() {
   const { ventas, loading } = useVentas()
+
   const [selectedVenta, setSelectedVenta] = useState(null)
   const [filtroFecha, setFiltroFecha] = useState('')
 
   const ventasFiltradas = ventas.filter(v => {
     if (!filtroFecha) return true
 
-    // Validar que exista la fecha
-    if (!v.creadoEn) return false
+    // Usar fecha o creadoEn
+    const fechaRaw = v.fecha || v.creadoEn
 
-    const fecha = new Date(v.creadoEn)
+    if (!fechaRaw) return false
+
+    const fecha = new Date(fechaRaw)
 
     // Validar fecha válida
     if (isNaN(fecha.getTime())) {
-      console.error('Fecha inválida:', v.creadoEn, v)
+      console.error('Fecha inválida:', fechaRaw, v)
       return false
     }
 
-    const fechaVenta = fecha.toISOString().split('T')[0]
+    // Evita problemas de zona horaria
+    const fechaVenta = fecha.toLocaleDateString('sv-SE')
 
     return fechaVenta === filtroFecha
   })
@@ -37,24 +41,28 @@ export default function Ventas() {
       render: (value) => `#${value}`
     },
     {
-  key: 'fecha',
-  label: 'Fecha',
-  render: (value, row) => {
-    
-    if (!value) return 'Sin fecha'
+      key: 'fecha',
+      label: 'Fecha',
+      render: (value, row) => {
+        const fechaRaw = value || row.creadoEn
 
-    const fecha = new Date(value)
-    if (isNaN(fecha.getTime())) return 'Fecha inválida'
+        if (!fechaRaw) return 'Sin fecha'
 
-    return fecha.toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-},
+        const fecha = new Date(fechaRaw)
+
+        if (isNaN(fecha.getTime())) {
+          return 'Fecha inválida'
+        }
+
+        return fecha.toLocaleDateString('es-CO', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      }
+    },
     {
       key: 'clienteNombre',
       label: 'Cliente',
@@ -118,7 +126,10 @@ export default function Ventas() {
             className="animate-pulse mx-auto mb-4 text-blue-600"
             size={48}
           />
-          <p className="text-gray-600">Cargando ventas...</p>
+
+          <p className="text-gray-600">
+            Cargando ventas...
+          </p>
         </div>
       </div>
     )
